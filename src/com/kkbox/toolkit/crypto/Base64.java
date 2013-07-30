@@ -40,23 +40,38 @@ public class Base64 {
 			map2[map1[i]] = (byte) i;
 	}
 	
+	/**
+	 * @brief		Base64 encoding.
+	 * @param in	Byte array to encode.
+	 * @return		Encoded string in String.
+	 */
 	public static String encodeString(byte[] in){
 		return new String(encode(in));
 	}
-
+	
+	/**
+	 * @brief		Base64 encoding.
+	 * @param s		String to encode.
+	 * @return		Encoded string in String.
+	 */
 	public static String encodeString(String s) {
 		return new String(encode(s.getBytes()));
 	}
 
+	/**
+	 * @brief		Base64 encoding.
+	 * @param in	Byte array to encode.
+	 * @return		Encoded string in Char array.
+	 */
 	public static char[] encode(byte[] in) {
 		return encode(in, in.length);
 	}
 
 	/**
-	 * encode() : Base64 encoding with length
-	 * @param in
-	 * @param iLen
-	 * @return
+	 * @brief		Base64 encoding with length.
+	 * @param in	Byte array to encode.
+	 * @param iLen	Input length.
+	 * @return		Encoded string in Char array.
 	 */
 	public static char[] encode(byte[] in, int iLen) {
 		int oDataLen = (iLen * 4 + 2) / 3; // output length without padding
@@ -83,18 +98,28 @@ public class Base64 {
 	}
 
 	/**
-	 * decodeString() : Decode string from base64.
-	 * @param s : String to decode
-	 * @return
+	 * @brief	Base64 decoding.
+	 * @param s	String to decode.
+	 * @return	Decoded string in String.
 	 */
 	public static String decodeString(String s) {
 		return new String(decode(s));
 	}
-
+	
+	/**
+	 * @brief	Base64 decoding.
+	 * @param s	String to decode.
+	 * @return	Decoded string in Byte array.
+	 */
 	public static byte[] decode(String s) {
 		return decode(s.toCharArray());
 	}
 
+	/**
+	 * @brief		Base64 decoding.
+	 * @param in	String to decode in Char array.
+	 * @return		Decoded string in Byte array.
+	 */
 	public static byte[] decode(char[] in) {
 		int iLen = in.length;
 		if (iLen % 4 != 0)
