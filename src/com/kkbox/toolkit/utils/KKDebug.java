@@ -13,7 +13,15 @@
 * limitations under the License.
 */
 /**
- * KKDebug
+ * @brief	KKDebug is a debug utility used during development.
+ * 
+ * @details
+ * 
+ * Before using KKDebug, you need to enable it in your app.
+ * Add the following line in your Application:
+ * @code
+ * 		KKDebug.setDebugEnabled(true);
+ * @endcode
  */
 package com.kkbox.toolkit.utils;
 
@@ -33,18 +41,34 @@ public class KKDebug {
 	private static String debugLogPath;
 	private static DataOutputStream logStream;
 
+	/**
+	 * @brief			Enable KKDebug.
+	 * @param enabled	If true, KKDebug is enabled; vice versa.
+	 */
 	public static void setDebugEnabled(boolean enabled) {
 		debugEnabled = enabled;
 	}
 
+	/**
+	 * @brief			Set debug log path.
+	 * @param path		Log path.
+	 */
 	public static void setDebugLogPath(String path) {
 		debugLogPath = path;
 	}
 
+	/**
+	 * @brief			See if KKDebug is enabled.
+	 * @return			If KKDebug is enabled, return true; vice versa.
+	 */
 	public static boolean isDebugEnabled() {
 		return debugEnabled;
 	}
 
+	/**
+	 * @brief			Send an INFO log message.
+	 * @param msg		Object to show in the log.
+	 */
 	public static void i(Object msg) {
 		if (debugEnabled) {
 			Log.i("KKBOX", "" + msg);
@@ -52,6 +76,11 @@ public class KKDebug {
 		}
 	}
 
+	/**
+	 * @brief			Send an INFO log message with prefix tag.
+	 * @param tag		The prefix tag to add before the log message.
+	 * @param msg		Object to show in the log.
+	 */
 	public static void i(String tag, Object msg) {
 		if (debugEnabled) {
 			Log.i(tag, "" + msg);
@@ -59,6 +88,10 @@ public class KKDebug {
 		}
 	}
 
+	/**
+	 * @brief			Send an ERROR log message.
+	 * @param msg		Object to show in the log.
+	 */
 	public static void e(Object msg) {
 		if (debugEnabled) {
 			Log.e("KKBOX", getClassLineNumber() + msg);
@@ -66,6 +99,11 @@ public class KKDebug {
 		}
 	}
 
+	/**
+	 * @brief			Send an ERROR log message with prefix tag.
+	 * @param tag		The prefix tag to add before the log message.
+	 * @param msg		Object to show in the log.
+	 */
 	public static void e(String tag, Object msg) {
 		if (debugEnabled) {
 			Log.e(tag, getClassLineNumber() + msg);
@@ -73,6 +111,10 @@ public class KKDebug {
 		}
 	}
 
+	/**
+	 * @brief			Send an WARN log message.
+	 * @param msg		Object to show in the log.
+	 */
 	public static void w(Object msg) {
 		if (debugEnabled) {
 			Log.w("KKBOX", "" + msg);
@@ -80,6 +122,11 @@ public class KKDebug {
 		}
 	}
 
+	/**
+	 * @brief			Send an WARN log message with prefix tag.
+	 * @param tag		The prefix tag to add before the log message.
+	 * @param msg		Object to show in the log.
+	 */
 	public static void w(String tag, Object msg) {
 		if (debugEnabled) {
 			Log.w(tag, "" + msg);
@@ -87,6 +134,10 @@ public class KKDebug {
 		}
 	}
 	
+	/**
+	 * @brief			Send an ASSERT log message.
+	 * @param msg		Object to show in the log.
+	 */
 	public static void wtf(Object msg) {
 		if (debugEnabled) {
 			Log.wtf("KKBOX", "" + msg);
@@ -94,6 +145,10 @@ public class KKDebug {
 		}
 	}
 
+	/**
+	 * @brief			Write log to file.
+	 * @param msg		Message to write to log file.
+	 */
 	private static void writeLog(String msg) {
 		if (debugLogPath == null) { return; }
 		try {
@@ -140,6 +195,9 @@ public class KKDebug {
 		}
 	}
 
+	/**
+	 * @brief			Print heap memory usage.
+	 */
 	public static void printHeapMemory() {
 		Double allocated = new Double(Debug.getNativeHeapAllocatedSize()) / new Double((1048576));
 		Double available = new Double(Debug.getNativeHeapSize()) / 1048576.0;

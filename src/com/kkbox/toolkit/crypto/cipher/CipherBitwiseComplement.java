@@ -13,7 +13,7 @@
 * limitations under the License.
 */
 /**
- * CipherBitwiseComplement
+ * CipherBitwiseComplement is a internal part of KKToolkit cipher. This class should not to be used directly.
  */
 package com.kkbox.toolkit.crypto.cipher;
 

@@ -13,7 +13,7 @@
 * limitations under the License.
 */
 /**
- * RC4j
+ * RC4j is a self-made RC4 library.
  */
 package com.kkbox.toolkit.crypto;
 

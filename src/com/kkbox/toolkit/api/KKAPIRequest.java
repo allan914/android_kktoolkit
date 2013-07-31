@@ -74,6 +74,11 @@ public class KKAPIRequest extends UserTask<Object, Void, Void> {
 		this.cipher = cipher;
 	}
 
+	/**
+	 * @brief			Add a key-value pair as a GET parameter to the API request.
+	 * @param key		The key name of GET parameter.
+	 * @param value		The value of GET parameter.
+	 */
 	public void addGetParam(String key, String value) {
 		if (getParams == "") {
 			getParams = "?";
@@ -83,6 +88,10 @@ public class KKAPIRequest extends UserTask<Object, Void, Void> {
 		getParams += key + "=" + value;
 	}
 
+	/**
+	 * @brief			Add a string as GET parameters to the API request.
+	 * @param parameter	The string to add as GET parameter.
+	 */
 	public void addGetParam(String parameter) {
 		if (getParams == "") {
 			getParams = "?";
@@ -92,6 +101,11 @@ public class KKAPIRequest extends UserTask<Object, Void, Void> {
 		getParams += parameter;
 	}
 
+	/**
+	 * @brief			Add a key-value pair as a POST parameter to the API request.
+	 * @param key		The key name of POST parameter.
+	 * @param value		The value of POST parameter.
+	 */
 	public void addPostParam(String key, String value) {
 		if (postParams == null) {
 			postParams = new ArrayList<NameValuePair>();
@@ -99,21 +113,39 @@ public class KKAPIRequest extends UserTask<Object, Void, Void> {
 		postParams.add((new BasicNameValuePair(key, value)));
 	}
 
+	/**
+	 * 
+	 * @param key
+	 * @param mimeType
+	 * @param data
+	 */
 	public void addMultiPartPostParam(String key, String mimeType, byte[] data) {
 		multipartEntity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
 		multipartEntity.addPart(key, new ByteArrayBody(data, mimeType, "filename"));
 	}
 
+	/**
+	 * 
+	 * @param data
+	 */
 	public void addStringPostParam(String data) {
 		try {
 			stringEntity = new StringEntity(data, HTTP.UTF_8);
 		} catch (Exception e) {};
 	}
 
+	/**
+	 * 
+	 * @param path
+	 */
 	public void addFilePostParam(String path) {
 		fileEntity = new FileEntity(new File(path), URLEncodedUtils.CONTENT_TYPE + HTTP.CHARSET_PARAM + HTTP.UTF_8);
 	}
 	
+	/**
+	 * 
+	 * @param data
+	 */
 	public void addByteArrayPostParam(byte[] data) {
 		byteArrayEntity = new ByteArrayEntity(data);
 		byteArrayEntity.setContentType("application/octet-stream");
