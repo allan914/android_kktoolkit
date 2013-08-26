@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 /**
- * KKDialogManager
+ * KKDialogManager manages KKDialogs.
  */
 package com.kkbox.toolkit.dialog;
 

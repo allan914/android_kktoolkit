@@ -12,23 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/**
- * @brief KKDialogPostExecutionListener is a listener to KKDialog.
- * 
- * @details
- * 
- * KKDialogPostExecutionListener handles click events triggered by KKDialog.
- * Different kind of dialog requires different functions to be implemented.
- * See wiki (https://github.com/KKBOX/android_kktoolkit/wiki/Examples:-Notification) for detailed instruction.
- */
-package com.kkbox.toolkit.dialog;
+package com.kkbox.toolkit.internal.ui;
 
-public abstract class KKDialogPostExecutionListener {
-	public void onPositive() {};
-
-	public void onNeutral() {};
-
-	public void onNegative() {};
-
-	public void onCancel() {};
+public abstract interface KKListViewOnRefreshListener {
+	public abstract void onRefresh();
 }

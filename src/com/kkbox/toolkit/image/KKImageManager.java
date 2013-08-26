@@ -20,13 +20,6 @@ package com.kkbox.toolkit.image;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.LinearGradient;
-import android.graphics.Matrix;
-import android.graphics.Paint;
-import android.graphics.PorterDuff.Mode;
-import android.graphics.PorterDuffXfermode;
-import android.graphics.Shader.TileMode;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -108,42 +101,12 @@ public class KKImageManager {
 		return context.getCacheDir().getAbsolutePath() + File.separator + "image" + File.separator + StringUtils.getMd5Hash(url);
 	}
 
-	public static Bitmap createMirrorBitmap(Bitmap bitmap) {
-		final int w = bitmap.getWidth();
-		final int h = bitmap.getHeight();
-		final int mirrorBitmapHeight = h / 2;
-		final Matrix matrix = new Matrix();
-		matrix.preScale(1, -1);
-		Runtime.getRuntime().gc();
-		final Bitmap newBitmap = Bitmap.createBitmap(w, mirrorBitmapHeight, Bitmap.Config.RGB_565);
-		final Bitmap reflectBitmap = Bitmap.createBitmap(bitmap, 0, h - mirrorBitmapHeight, w, mirrorBitmapHeight, matrix, true);
-		final Canvas canvas = new Canvas(newBitmap);
-		final Paint paint = new Paint();
-		final LinearGradient shader = new LinearGradient(0, 0, 0, mirrorBitmapHeight, 0x80ffffff, 0x00ffffff, TileMode.MIRROR);
-		paint.setShader(shader);
-		paint.setDither(true);
-		paint.setXfermode(new PorterDuffXfermode(Mode.LIGHTEN));
-		canvas.drawBitmap(reflectBitmap, 0, 0, null);
-		canvas.drawRect(0, 0, w, mirrorBitmapHeight, paint);
-		reflectBitmap.recycle();
-		return newBitmap;
+	public static void removeCacheIfExists(Context context, String url) {
+		final File cacheFile = new File(getTempImagePath(context, url));
+		cacheFile.delete();
 	}
 
-	public KKImageManager(Context context, Cipher localCipher) {
-		this.context = context;
-		this.cipher = localCipher;
-		if (Build.VERSION.SDK_INT >= 9 && context.getCacheDir().getFreeSpace() < FATAL_STORAGE_SIZE) {
-			File cacheDir = new File(context.getCacheDir().getAbsolutePath() + File.separator + "image");
-			if (cacheDir.exists()) {
-				for (File file : cacheDir.listFiles()) {
-					file.delete();
-				}
-			}
-		}
-		gc();
-	}
-
-	public void autoRecycleViewBackgroundBitmap(View view) {
+	public static void autoRecycleViewBackgroundBitmap(View view) {
 		if (Build.VERSION.SDK_INT < 11) {
 			Iterator iterator = viewBackgroundBitmapReference.entrySet().iterator();
 			while (iterator.hasNext()) {
@@ -156,7 +119,6 @@ public class KKImageManager {
 						bitmap = null;
 					}
 					iterator.remove();
-					break;
 				}
 			}
 			Drawable drawable = view.getBackground();
@@ -167,7 +129,7 @@ public class KKImageManager {
 		}
 	}
 
-	public void autoRecycleViewSourceBitmap(ImageView view) {
+	public static void autoRecycleViewSourceBitmap(ImageView view) {
 		if (Build.VERSION.SDK_INT < 11) {
 			Iterator iterator = imageViewSourceBitmapReference.entrySet().iterator();
 			while (iterator.hasNext()) {
@@ -180,7 +142,6 @@ public class KKImageManager {
 						bitmap = null;
 					}
 					iterator.remove();
-					break;
 				}
 			}
 			Drawable drawable = view.getDrawable();
@@ -191,7 +152,7 @@ public class KKImageManager {
 		}
 	}
 
-	public void gc() {
+	public static void gc() {
 		if (Build.VERSION.SDK_INT < 11) {
 			Iterator iterator = viewBackgroundBitmapReference.entrySet().iterator();
 			while (iterator.hasNext()) {
@@ -220,32 +181,55 @@ public class KKImageManager {
 		}
 	}
 
-	public void downloadBitmap(String url, String localPath) {
-		KKImageRequest request = new KKImageRequest(context, url, localPath, cipher);
+	public KKImageManager(Context context, Cipher localCipher) {
+		this.context = context;
+		this.cipher = localCipher;
+		if (Build.VERSION.SDK_INT >= 9 && context.getCacheDir().getFreeSpace() < FATAL_STORAGE_SIZE) {
+			File cacheDir = new File(context.getCacheDir().getAbsolutePath() + File.separator + "image");
+			if (cacheDir.exists()) {
+				for (File file : cacheDir.listFiles()) {
+					file.delete();
+				}
+			}
+		}
+		gc();
+	}
+
+	public void downloadBitmap(String url, String localPath, KKImageOnReceiveHttpHeaderListener onReceiveHttpHeaderListener) {
+		KKImageRequest request = new KKImageRequest(context, url, localPath, onReceiveHttpHeaderListener, cipher);
 		workingList.add(request);
 		startFetch();
 	}
 
-	public void loadBitmap(KKImageListener listener, String url, String localPath) {
+	public KKImageRequest loadBitmap(KKImageListener listener, String url, String localPath) {
 		KKImageRequest request = new KKImageRequest(context, url, localPath, listener, cipher);
 		workingList.add(request);
 		startFetch();
+		return request;
 	}
 
 	public void updateViewSource(ImageView view, String url, String localPath, int defaultResourceId) {
-		updateView(view, url, localPath, defaultResourceId, false);
+		updateView(view, url, localPath, defaultResourceId, false, false, null);
+	}
+
+	public void updateViewSourceAndSave(ImageView view, String url, String localPath, int defaultResourceId,
+			KKImageOnReceiveHttpHeaderListener onReceiveHttpHeaderListener) {
+		updateView(view, url, localPath, defaultResourceId, false, true, onReceiveHttpHeaderListener);
 	}
 
 	public void updateViewBackground(View view, String url, String localPath, int defaultResourceId) {
-		updateView(view, url, localPath, defaultResourceId, true);
+		updateView(view, url, localPath, defaultResourceId, true, false, null);
+	}
+
+	public void updateViewBackgroundAndSave(View view, String url, String localPath, int defaultResourceId,
+			KKImageOnReceiveHttpHeaderListener onReceiveHttpHeaderListener) {
+		updateView(view, url, localPath, defaultResourceId, true, true, onReceiveHttpHeaderListener);
 	}
 
 	public Bitmap loadCache(String url, String localPath) {
 		String cachePath = getTempImagePath(context, url);
 		final File cacheFile = new File(cachePath);
-		if (cacheFile.exists()) {
-			return BitmapFactory.decodeFile(cachePath);
-		}
+		if (cacheFile.exists()) { return BitmapFactory.decodeFile(cachePath); }
 		return null;
 	}
 
@@ -256,12 +240,8 @@ public class KKImageManager {
 		}
 	}
 
-	public void removeCacheIfExists(String url) {
-		final File cacheFile = new File(getTempImagePath(context, url));
-		cacheFile.delete();
-	}
-
-	private void updateView(View view, String url, String localPath, int defaultResourceId, boolean updateBackground) {
+	private void updateView(View view, String url, String localPath, int defaultResourceId, boolean updateBackground, boolean saveToLocal,
+			KKImageOnReceiveHttpHeaderListener onReceiveHttpHeaderListener) {
 		KKImageRequest request = fetchList.get(view);
 		if (request != null) {
 			if (request.getUrl().equals(url)) {
@@ -294,7 +274,7 @@ public class KKImageManager {
 				imageView.setImageResource(defaultResourceId);
 			}
 		}
-		request = new KKImageRequest(context, url, localPath, view, updateBackground, cipher);
+		request = new KKImageRequest(context, url, localPath, onReceiveHttpHeaderListener, view, updateBackground, cipher, saveToLocal);
 		workingList.add(request);
 		fetchList.put(view, request);
 		startFetch();

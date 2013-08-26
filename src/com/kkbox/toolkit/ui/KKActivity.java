@@ -43,6 +43,7 @@ public abstract class KKActivity extends FragmentActivity {
 	private KKActionBar actionBar;
 	private KKMenuInflaterCompat menuInflater;
 	private KKMenuCompat menuCompat;
+	private Menu menu;
 
 	public KKActionBar getKKActionBar() {
 		return actionBar;
@@ -56,6 +57,9 @@ public abstract class KKActivity extends FragmentActivity {
 
 	@Override
 	public KKMenuInflaterCompat getMenuInflater() {
+		if (menuInflater == null) {
+			menuInflater = new KKMenuInflaterCompat(this);
+		}
 		return menuInflater;
 	}
 
@@ -85,6 +89,12 @@ public abstract class KKActivity extends FragmentActivity {
 		onCreateCompatOptionsMenu(new KKMenuCompat(this, this));
 		if (Build.VERSION.SDK_INT >= 11) {
 			super.invalidateOptionsMenu();
+		} else if (menu != null) {
+			menu.clear();
+			createOptionsMenu(this.menuCompat, menu);
+			for (KKFragment fragment : activeSubFragments) {
+				fragment.onCreateOptionsMenu(menu, menuInflater);
+			}
 		}
 	}
 
@@ -98,7 +108,12 @@ public abstract class KKActivity extends FragmentActivity {
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		onPrepareCompatOptionsMenu(menuCompat);
-		return true;
+		prepareOptionsMenu(menuCompat, menu);
+		if (menu.size() > 0) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	@Override
@@ -116,6 +131,7 @@ public abstract class KKActivity extends FragmentActivity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
+		this.menu = menu;
 		createOptionsMenu(this.menuCompat, menu);
 		return true;
 	}
@@ -242,6 +258,17 @@ public abstract class KKActivity extends FragmentActivity {
 					menu.removeItem(menuItem.getItemId());
 					removeCount++;
 				}
+			}
+		}
+	}
+
+	void prepareOptionsMenu(KKMenuCompat menuCompat, Menu menu) {
+		for (int i = 0; i < menu.size(); i++) {
+			MenuItem menuItem = menu.getItem(i);
+			KKMenuItemCompat menuItemCompat = menuCompat.findItem(menuItem.getItemId());
+			if (menuItemCompat != null && Build.VERSION.SDK_INT < 11
+					&& menuItemCompat.getShowAsActionFlags() == KKMenuItemCompat.SHOW_AS_ACTION_NEVER) {
+				menuItemCompat.linkToMenuItem(menuItem);
 			}
 		}
 	}

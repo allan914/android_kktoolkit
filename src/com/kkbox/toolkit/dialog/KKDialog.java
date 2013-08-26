@@ -13,7 +13,13 @@
  * limitations under the License.
  */
 /**
- * KKDialogFragment
+ * @brief	KKDialog is a dialog notification class.
+ * 
+ * @details
+ * 
+ * KKDialog creates a system-wide dialog that can be used by Activities, Fragments, or others.
+ * In order to work, you will need to enable KKService; KKDialog rely on it.
+ * You may use factory functions provided in KKDialogFactory to create dialogs instead of calling here.
  */
 package com.kkbox.toolkit.dialog;
 
